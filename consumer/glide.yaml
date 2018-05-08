@@ -1,0 +1,7 @@
+package: gokafka/consumer
+license: MIT
+import:
+- package: github.com/dynastymasra/gochill
+- package: github.com/Shopify/sarama
+- package: github.com/satori/go.uuid
+- package: github.com/bsm/sarama-cluster

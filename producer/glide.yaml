@@ -1,0 +1,6 @@
+package: gokafka/producer
+license: MIT
+import:
+- package: github.com/dynastymasra/gochill
+- package: github.com/Shopify/sarama
+- package: github.com/satori/go.uuid
