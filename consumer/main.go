@@ -45,23 +45,33 @@ func main() {
 		log.O("package", runtime.FuncForPC(reflect.ValueOf(main).Pointer()).Name()),
 		log.O("topics", topics))
 
+	JobQueue = make(chan Job, 5)
+	go func() {
+		dispatcher := NewDispatcher(5, JobQueue)
+		dispatcher.Run()
+	}()
+
 	for {
 		select {
 		case notification := <-consumer.Notifications():
 			log.Warn(log.Msg("Consumer notification", fmt.Sprintf("%+v", notification)),
 				log.O("package", runtime.FuncForPC(reflect.ValueOf(main).Pointer()).Name()),
 				log.O("brokers", brokers), log.O("topics", topics))
+			JobQueue <- Job{Notification: notification, Error: nil}
 		case err := <-consumer.Errors():
 			log.Error(log.Msg("Consumer get errors", err.Error()),
 				log.O("package", runtime.FuncForPC(reflect.ValueOf(main).Pointer()).Name()),
 				log.O("brokers", brokers), log.O("topics", topics))
+			JobQueue <- Job{Notification: nil, Error: err}
 		case message := <-consumer.Messages():
 			log.Info(log.Msg("Got message from broker", string(message.Value)), log.O("offset", message.Offset),
 				log.O("package", runtime.FuncForPC(reflect.ValueOf(main).Pointer()).Name()),
 				log.O("brokers", brokers), log.O("topic", message.Topic), log.O("partition", message.Partition))
+			JobQueue <- Job{Notification: nil, Error: nil, Payload: message}
 		case sig := <-stop:
 			log.Info(log.Msg("Application prepare to shutdown", fmt.Sprintf("%+v", sig)),
 				log.O("package", runtime.FuncForPC(reflect.ValueOf(main).Pointer()).Name()))
+			close(JobQueue)
 			os.Exit(0)
 		}
 	}

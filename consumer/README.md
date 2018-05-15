@@ -6,6 +6,8 @@
 
 This sample Golang use kafka for message broker. This used for consume message from kafka broker.
 
+Consumer use [Job/Worker pattern](http://marcio.io/2015/07/handling-1-million-requests-per-minute-with-golang/)
+
 ## Libraries
 Use glide command for install all dependencies required this application.
   - Use command `glide install` for install all dependency.
@@ -13,4 +15,4 @@ Use glide command for install all dependencies required this application.
   
 ## How To Run and Deploy
 
-Use command go `go run main.go` in root folder for run this application.
+Use command go `go run *.go` in root folder for run this application.
