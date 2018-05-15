@@ -76,22 +76,22 @@ func main() {
 		log.O("package", runtime.FuncForPC(reflect.ValueOf(main).Pointer()).Name()),
 		log.O("brokers", brokers))
 
-	//go func(producer sarama.SyncProducer) {
-	//	for {
-	//		message := &sarama.ProducerMessage{
-	//			Topic: "test",
-	//			Value: sarama.StringEncoder(fmt.Sprintf("UUID > %v", uuid.NewV4().String())),
-	//		}
-	//
-	//		partition, offset, err := producer.SendMessage(message)
-	//		if err != nil {
-	//			log.Alert(log.Msg("Failed send multiple message to broker", err.Error()),
-	//				log.O("package", runtime.FuncForPC(reflect.ValueOf(main).Pointer()).Name()),
-	//				log.O("partition", partition), log.O("offset", offset))
-	//			os.Exit(1)
-	//		}
-	//	}
-	//}(producer)
+	go func(producer sarama.SyncProducer) {
+		for {
+			message := &sarama.ProducerMessage{
+				Topic: "test",
+				Value: sarama.StringEncoder(fmt.Sprintf("UUID > %v", uuid.NewV4().String())),
+			}
+
+			partition, offset, err := producer.SendMessage(message)
+			if err != nil {
+				log.Alert(log.Msg("Failed send multiple message to broker", err.Error()),
+					log.O("package", runtime.FuncForPC(reflect.ValueOf(main).Pointer()).Name()),
+					log.O("partition", partition), log.O("offset", offset))
+				os.Exit(1)
+			}
+		}
+	}(producer)
 
 	log.Warn(log.Msg("Run infinite loop send single message", "This must stop manually!"),
 		log.O("package", runtime.FuncForPC(reflect.ValueOf(main).Pointer()).Name()))
