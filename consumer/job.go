@@ -13,4 +13,6 @@ type Job struct {
 	Broker       string
 	Topics       []string
 	Error        error
+	Retry        int
+	MaxRetry     int
 }
